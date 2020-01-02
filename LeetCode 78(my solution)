@@ -1,0 +1,23 @@
+class Solution {
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new LinkedList<>();
+        List<Integer> tmp = new LinkedList<>();
+        helper(0,nums.length-1,tmp,res,nums);
+        return res;
+    }
+    void helper(int start,int end,List<Integer> tmp,List<List<Integer>> res,int[] nums)
+    {
+        if(start>end)
+        {
+            res.add(new LinkedList<>(tmp));
+            return ;
+        }
+        for(int i=start;i<=end;i++)
+        {
+            tmp.add(nums[i]);
+            helper(i+1,end,tmp,res,nums);
+            tmp.remove(tmp.size()-1);
+        }
+        helper(end+1,end,tmp,res,nums);
+    }
+}
