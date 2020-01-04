@@ -1,0 +1,48 @@
+public class Solution {
+    public List<List<String>> solveNQueens(int n) {
+        char[][] board = new char[n][n];
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j < n; j++)
+                board[i][j] = '.';//初始化一个棋盘，点表示没有皇后，Q表示有皇后
+        List<List<String>> res = new ArrayList<List<String>>();
+        dfs(board, 0, res);
+        // 从第一列开始往后扫描，检查当前列是否能都放置一个皇后；
+        return res;
+    }
+  private void dfs(char[][] board, int colIndex, List<List<String>> res) {
+        //若扫描到最后一列，说明找到了一组解，把当前解加入res
+        if(colIndex == board.length) {
+            res.add(construct(board));
+            return;
+        }
+//对于每一列，从第一行扫描到最后最后一行。i表示第几行，colIndex表示第几列，检查board【i】【colIndex】这个位置能否放置一个皇后，如果能放置一个皇后，我们有两种选择，第一种选择，当前位置放一个皇后，第二种选择，当前位置不放置一个皇后。对于第一种选择，当前位置的值更新为Q（表示放了一个皇后），继续扫描下一列，也就是colIndex+1列。对于第二种选择，当前位置的值不变，仍然为'.'表示当前位置没有放置皇后。如果当前位置没有放置皇后，那么我们就继续扫描第colIndex列的下一行，也就是i+1行（因为每一列必定得放置一个皇后）。
+        for(int i = 0; i < board.length; i++) {
+            if(validate(board, i, colIndex)) {//该函数检查此位置能否放置皇后
+                board[i][colIndex] = 'Q';//第一种选择：若能放置皇后，就放一个皇后
+                dfs(board, colIndex + 1, res);//放了一个皇后之后，这一列就不能再放了，扫描下一列
+                board[i][colIndex] = '.';//第二种选择：若能放置皇后，偏偏不放皇后，让它是空的。所以把刚刚放的皇后拿走。Q变为'.''
+            }
+        }
+    }
+    //此函数检查当前位置能否放置皇后
+    private boolean validate(char[][] board, int x, int y) {
+        for(int i = 0; i < board.length; i++) {
+            for(int j = 0; j < y; j++) {
+                if(board[i][j] == 'Q' && (x + j == y + i || x + y == i + j || x == i))
+//x+j==y+i表示当前皇后和之前的皇后处于左上右下对角线上 x+y==i+j表示当前皇后和之前的皇后处于右上左下对角线上  x==i表示当前皇后和之前的皇后处于同一行  为什么不用检查是否在同一列？因为我们把当前列放置一个皇后之后就直接扫描下一列了，保证每一列就只有一个皇后
+                    return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private List<String> construct(char[][] board) {
+        List<String> res = new LinkedList<String>();
+        for(int i = 0; i < board.length; i++) {
+            String s = new String(board[i]);
+            res.add(s);
+        }
+        return res;
+    }
+}
