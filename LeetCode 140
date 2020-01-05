@@ -1,0 +1,25 @@
+class Solution {
+public List<String> wordBreak(String s, List<String> wordDict) {
+    Set<String> set = new HashSet(wordDict);
+    return DFS(s, set, new HashMap<String, LinkedList<String>>());
+}       
+//DFS会返回一个List<String> 每个String都是能拼凑成S的单词组成的一组字符串，由于每个S可能由不同的单词组成，因此会有多组String，这些String组成了一个List
+List<String> DFS(String s, Set<String> wordDict, HashMap<String, LinkedList<String>>map) {
+    if (map.containsKey(s)) //如果当前字符串S已经有了拼凑方案，那么就直接返回S的拼凑方案
+        return map.get(s);
+    LinkedList<String>res = new LinkedList<String>();     
+    if (s.length() == 0) {
+        res.add("");
+        return res;
+    }               
+    for (String word : wordDict) {// 扫描词典里的每个单词
+        if (s.startsWith(word)) {//当发现S以某个单词开头，把当前单词从S里去掉。例如S=“dogandcat”，如果我们发现词典里有dog这个单词，那么s的subString就变成了“andcat”，继续调用DFS看看“andcat”能被哪些单词拼凑起来。能够拼凑出“andcat”的单词组成的一组字符串我们称之为sub，最后把dog + sub就是一组能够拼凑出“dogandcat”的单词了。由于能够拼出andcat的单词组合方案可能由很多种，因此有多个sub，这些sub组成了一个sublist。
+            List<String>sublist = DFS(s.substring(word.length()), wordDict, map);
+            for (String sub : sublist) 
+                res.add(word + (sub.isEmpty() ? "" : " ") + sub);               
+        }
+    }       
+    map.put(s, res);//s表示待拼凑的字符串，res表示所有能够拼凑出s的单词。 为什么要存起来？减少不必要的搜索。例如 "catsandhahahahha"，如果我们的词典里有cats，cat，s这三个单词。那么当我们去掉cats的时候，会得到一个substring（andhahahahha），我们需要计算andhahahahha由哪些单词组成，并且把它的组成方案存起来。在之后的扫描中，我们会扫描到cat，当我们去掉cat的时候，会得到一个substring（sandhahahahha），再去掉s的时候，会得到一个substring（andhahahahha），此时此刻，我们不需要再次计算andhahahahha可以由哪些单词组成，因为直接调用map.get("andhahahahha")就可以直接得到它的组成方案。
+    return res;
+ }
+}
