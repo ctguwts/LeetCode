@@ -1,0 +1,33 @@
+//这题实际上寻找一个图里面有没有环。把每个课程想象成一个Node，如果若干个Node循环了，证明不能完成所有课程。例如A是B的prerequisite，B是A的prerequisite，这就是一个循环。
+class Solution {
+   public boolean canFinish(int numCourses, int[][] prerequisites) {
+            ArrayList[] graph = new ArrayList[numCourses];
+            for(int i=0;i<numCourses;i++)
+            graph[i] = new ArrayList();
+            boolean[] visited = new boolean[numCourses];
+            boolean[] dp = new boolean[numCourses];
+            for(int i=0; i<prerequisites.length;i++){
+                graph[prerequisites[i][1]].add(prerequisites[i][0]);
+            }
+            for(int i=0; i<numCourses; i++){
+                if(!dfs(graph,visited,i, dp))
+                    return false;
+            }
+            return true;
+        }
+    private boolean dfs(ArrayList[] graph, boolean[] visited, int course, boolean[] dp){
+            if(visited[course])//表示已经访问过该Node了
+                return dp[course];//默认情况下，dp数组都为flase。也就是说每当走到这一步说明进入了一个循环，比如说A是B的prerequisite，B是C的prerequisite，C是A的prerequisite，此时此刻Visited【A】就是true，因为A被访问过。于是return dp【course】，默认是false。还有另一种情况：我们发现dp只有在一个dfs的结尾才会被更新为true，这说明此dp【course】可以顺利搜索到结尾没有陷入循环中。举个例子A是B的prerequisite，B是C的prerequisite，没有循环存在，那么以A为起点的dfs结束之后dp【A】就会变成true。如果现在有一个新的路径D->A，那么以D为起点的DFS肯定会搜索到A，当我们发现visited[A]是true，A点已经被访问过我们就不需要以A为起点进行DFS了，直接return dp[A]。
+            else
+                visited[course] = true;
+
+            for(int i=0; i<graph[course].size();i++){
+                if(!dfs(graph,visited,(int)graph[course].get(i), dp)) {
+                    dp[course] = false;
+                    return false;
+                }
+            }
+            dp[course] = true;
+            return true;
+        }
+}
